@@ -10,17 +10,20 @@ interface OpenSectionsState { [key: number]: boolean; }
 interface CourseLessonsTabProps { 
     lessons: Lesson[]; 
     sections: Section[]; 
+    onLessonPressPause?: () => void;
 }
 interface SectionWithLessons extends Section { lessons: Lesson[]; }
 
-export default function CourseLessonsTab({ lessons, sections }: CourseLessonsTabProps) {
+export default function CourseLessonsTab({ lessons, sections, onLessonPressPause }: CourseLessonsTabProps) {
   const [openSections, setOpenSections] = useState<OpenSectionsState>({ 9: true });
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'Learning'>>();
 
   const handleLessonPress = (lesson: Lesson, courseId: number) => {
     if (lesson.is_free) {
+      onLessonPressPause?.()
       navigation.navigate('Learning', {lessonId: lesson.id, courseId: courseId,});
+      
     } else {
       Alert.alert("Bạn phải mua khóa học để xem bài này!");
     }

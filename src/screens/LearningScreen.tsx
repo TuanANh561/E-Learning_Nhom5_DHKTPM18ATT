@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { Video, ResizeMode } from 'expo-av';
+import { VideoView, useVideoPlayer } from 'expo-video'; // ✅ Dùng expo-video mới
 
 import useCourses from '../hooks/useCourses';
 import useLessons from '../hooks/useLessons';
@@ -20,7 +20,7 @@ import useSections from '../hooks/useSections';
 import { RootStackParamList, Lesson, Course } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-// Import chỉ 2 tab
+// Import 2 tab
 import LessonsTab from '../components/learning/LessonsTab';
 import QATab from '../components/learning/QATab';
 
@@ -40,6 +40,7 @@ export default function LearningScreen() {
   const { fetchCourseById, loading: loadingCourses } = useCourses();
   const { sections, loading: loadingSections } = useSections();
 
+  // 🔹 Fetch dữ liệu ban đầu
   useEffect(() => {
     const loadData = async () => {
       const [lesson, course] = await Promise.all([
@@ -52,6 +53,11 @@ export default function LearningScreen() {
     };
     loadData();
   }, [lessonId, courseId]);
+
+  // ✅ Player (thay vì dùng <Video/> cũ)
+  const player = useVideoPlayer(currentLesson?.video_url || '', player => {
+    player.pause();
+  });
 
   const handleLessonPress = useCallback((lesson: Lesson) => {
     setCurrentLesson(lesson);
@@ -102,17 +108,14 @@ export default function LearningScreen() {
           </View>
         </View>
 
-        {/* Video */}
+        {/* Video player */}
         <View style={styles.videoContainer}>
-          <Video
-            source={{ uri: currentLesson.video_url }}
-            rate={1.0}
-            volume={1.0}
-            isMuted={false}
-            resizeMode={ResizeMode.CONTAIN}
-            shouldPlay={false}
-            useNativeControls
+          <VideoView
+            player={player}
             style={styles.video}
+            allowsFullscreen
+            allowsPictureInPicture
+            nativeControls
           />
         </View>
 
@@ -129,7 +132,7 @@ export default function LearningScreen() {
           </View>
         </View>
 
-        {/* Tab Bar - Chỉ còn 2 tab */}
+        {/* Tab Bar */}
         <View style={styles.tabBarContainer}>
           {(['lessons', 'qa'] as const).map(tab => (
             <Pressable
@@ -151,7 +154,7 @@ export default function LearningScreen() {
   );
 }
 
-// === STYLES (giữ nguyên, chỉ xóa phần không dùng) ===
+// === STYLES ===
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },

@@ -1,9 +1,17 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { ScrollView, View, Text, StyleSheet, Pressable, Dimensions, ActivityIndicator,} from 'react-native';
+import React, { useState, useMemo, useEffect } from 'react';
+import {
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Dimensions,
+  ActivityIndicator,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
-import { Video, ResizeMode } from 'expo-av';
+import { VideoView, useVideoPlayer } from 'expo-video';
 import * as ScreenOrientation from 'expo-screen-orientation';
 
 import useCourses from '../hooks/useCourses';
@@ -31,7 +39,6 @@ export default function CourseDetailScreen() {
   const { reviews, loading: reviewsLoading } = useReviews();
 
   const [activeTab, setActiveTab] = useState('OVERVIEW');
-  const videoRef = useRef<Video>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
 
   const course = useMemo(() => courses.find(c => Number(c.id) === courseId), [courses, courseId]);
@@ -48,17 +55,29 @@ export default function CourseDetailScreen() {
   );
   const courseReviews = useMemo(() => reviews.filter(r => r.course_id === courseId), [reviews, courseId]);
 
-  useEffect(() => {
-    if (!coursesLoading && !reviewsLoading) {
-      setActiveTab('OVERVIEW');
+  // 🎬 Khởi tạo video player
+  const player = useVideoPlayer(
+    course?.video_url_preview || 'https://www.w3schools.com/html/mov_bbb.mp4',
+    (player) => {
+      player.pause(); // không tự play khi mở
     }
-  }, [coursesLoading, reviewsLoading]);
+  );
 
-  // 🔁 Tự động theo dõi khi người dùng xoay thiết bị
+  // 🛑 Hàm dừng video
+  const handlePauseVideo = () => {
+    if (player && player.pause) {
+      player.pause();
+    }
+  };
+
+  // 🔁 Theo dõi xoay màn hình
   useEffect(() => {
     const subscription = ScreenOrientation.addOrientationChangeListener(evt => {
       const o = evt.orientationInfo.orientation;
-      if (o === ScreenOrientation.Orientation.LANDSCAPE_LEFT || o === ScreenOrientation.Orientation.LANDSCAPE_RIGHT) {
+      if (
+        o === ScreenOrientation.Orientation.LANDSCAPE_LEFT ||
+        o === ScreenOrientation.Orientation.LANDSCAPE_RIGHT
+      ) {
         setIsFullScreen(true);
       } else {
         setIsFullScreen(false);
@@ -67,11 +86,19 @@ export default function CourseDetailScreen() {
     return () => ScreenOrientation.removeOrientationChangeListener(subscription);
   }, []);
 
+  useEffect(() => {
+    if (!coursesLoading && !reviewsLoading) {
+      setActiveTab('OVERVIEW');
+    }
+  }, [coursesLoading, reviewsLoading]);
+
   if (!courseId) {
     return (
       <View style={styles.loading}>
         <Text style={{ color: '#ff4444' }}>Lỗi: Không tìm thấy ID khóa học.</Text>
-        <Pressable onPress={() => navigation.goBack()} style={{ marginTop: 10, padding: 8, backgroundColor: '#eee', borderRadius: 5 }}>
+        <Pressable
+          onPress={() => navigation.goBack()}
+          style={{ marginTop: 10, padding: 8, backgroundColor: '#eee', borderRadius: 5 }}>
           <Text>Quay lại</Text>
         </Pressable>
       </View>
@@ -87,7 +114,7 @@ export default function CourseDetailScreen() {
       case 'OVERVIEW':
         return <CourseOverviewTab course={course} teacher={teacher} similarCourses={similarCourses} />;
       case 'LESSONS':
-        return <CourseLessonsTab lessons={courseLessons} sections={courseSections} />;
+        return <CourseLessonsTab lessons={courseLessons} sections={courseSections} onLessonPressPause={handlePauseVideo}  />;
       case 'REVIEW':
         return <CourseReviewTab reviews={courseReviews} course={course} />;
       default:
@@ -114,13 +141,11 @@ export default function CourseDetailScreen() {
 
         {/* === VIDEO PLAYER === */}
         <View style={[styles.videoContainer, isFullScreen && styles.videoFull]}>
-          <Video
-            ref={videoRef}
-            source={{ uri: course.video_url_preview || 'https://www.w3schools.com/html/mov_bbb.mp4' }}
+          <VideoView
             style={styles.video}
-            resizeMode={ResizeMode.CONTAIN}
-            useNativeControls
-            shouldPlay={false}
+            player={player}
+            allowsFullscreen
+            allowsPictureInPicture
           />
         </View>
 
@@ -189,14 +214,6 @@ const styles = StyleSheet.create({
     zIndex: 99,
   },
   video: { width: '100%', height: '100%' },
-  fullscreenButton: {
-    position: 'absolute',
-    bottom: 10,
-    right: 10,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 25,
-    padding: 6,
-  },
   mainInfoContainer: { paddingHorizontal: 20, paddingTop: 10 },
   courseTitle: { fontSize: 22, fontWeight: 'bold', marginBottom: 5 },
   ratingRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
