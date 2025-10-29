@@ -76,3 +76,29 @@ export interface Favorite {
   user_id: number;
   course_id: number;
 };
+
+export type Enrollment = {
+  id: number;
+  user_id: number;
+  course_id: number;
+  enrollment_date: string;
+  order_id: number | null;
+};
+
+export type LessonProgress = {
+  id: number;
+  enrollment_id: number;
+  lesson_id: number;
+  is_completed: boolean;
+  updated_at: string;
+};
+
+export type MyCourse = {
+  user_id?: number;
+  id: number;
+  title: string;
+  thumbnail: string;
+  lesson_count: number;
+  completed_count: number;
+  progress_percent: number;
+};
