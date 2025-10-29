@@ -116,7 +116,7 @@ export default function CourseDetailScreen() {
         <View style={[styles.videoContainer, isFullScreen && styles.videoFull]}>
           <Video
             ref={videoRef}
-            source={{ uri: course.video_url_preview }}
+            source={{ uri: course.video_url_preview || 'https://www.w3schools.com/html/mov_bbb.mp4' }}
             style={styles.video}
             resizeMode={ResizeMode.CONTAIN}
             useNativeControls
