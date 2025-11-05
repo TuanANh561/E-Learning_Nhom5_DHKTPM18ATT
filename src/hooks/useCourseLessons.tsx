@@ -14,19 +14,8 @@ export default function useCourseLessons(courseId: number) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [secRes, lesRes] = await Promise.all([
-          axios.get(`${API_URL.sections}?course_id=${courseId}`),
-          axios.get(API_URL.lessons),
-        ]);
-
-        const sectionsData: Section[] = secRes.data;
-        const lessonsData: Lesson[] = lesRes.data;
-
-        const merged = sectionsData.map((section) => ({
-          ...section, lessons: lessonsData.filter((l) => Number(l.section_id) === Number(section.id)),
-        }));
-
-        setSections(merged);
+        const res = await axios.get(`${API_URL.sections}/by-course?course_id=${courseId}`);
+        setSections(res.data);
       } catch (error) {
         console.error('Lỗi khi lấy dữ liệu sections/lessons:', error);
       } finally {

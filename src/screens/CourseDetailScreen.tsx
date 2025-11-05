@@ -5,7 +5,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import useCourses from '../hooks/useCourses';
-import useUsers from '../hooks/useUsers';
 import useReviews from '../hooks/useReviews';
 import { Course, User, Review } from '../types';
 import CourseOverviewTab from '../components/courseDetails/CourseOverviewTab';
@@ -13,6 +12,7 @@ import CourseLessonsTab from '../components/courseDetails/CourseLessonsTab';
 import CourseReviewTab from '../components/courseDetails/CourseReviewTab';
 import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
+import useEnrollment from '../hooks/useEnrollment';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -29,8 +29,11 @@ export default function CourseDetailScreen() {
   const [courseReviews, setCourseReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [activeTab, setActiveTab] = useState('OVERVIEW');
+  const [activeTab, setActiveTab] = useState('Tổng quan');
   const [isFullScreen, setIsFullScreen] = useState(false);
+
+  const CURRENT_USER_ID = 1;
+  const { isEnrolled, loading: enrollmentLoading } = useEnrollment(CURRENT_USER_ID, course?.id || null);
 
 useEffect(() => {
   if (!courseId) return;
@@ -106,12 +109,12 @@ useEffect(() => {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'OVERVIEW':
+      case 'Tổng quan':
         return <CourseOverviewTab course={course} similarCourses={similarCourses} />;
-      case 'LESSONS':
-        return <CourseLessonsTab courseId={courseId} onLessonPressPause={handlePauseVideo}  />;
-      case 'REVIEW':
-        return <CourseReviewTab reviews={courseReviews} course={course} />;
+      case 'Bài học':
+        return <CourseLessonsTab courseId={courseId} onLessonPressPause={handlePauseVideo} isEnrolled={isEnrolled}/>;
+      case 'Đánh giá':
+        return <CourseReviewTab reviews={courseReviews} course={course} isEnrolled={isEnrolled}/>;
       default:
         return null;
     }
@@ -125,7 +128,7 @@ useEffect(() => {
             <Pressable onPress={() => navigation.goBack()}>
               <Ionicons name="arrow-back-outline" size={24} color="#000" />
             </Pressable>
-            <Text style={styles.headerTitle}>Course details</Text>
+            <Text style={styles.headerTitle}>Chi tiết Khóa học</Text>
             <View style={styles.headerIcons}>
               <Ionicons name="bookmark-outline" size={24} color="#000" style={{ marginRight: 10 }} />
               <Ionicons name="ellipsis-vertical" size={24} color="#000" />
@@ -150,12 +153,12 @@ useEffect(() => {
                   <Ionicons name="star" size={16} color="#FFD700" /> 
                   {course.ratingAvg.toFixed(1)} ({course.ratingCount})
                 </Text>
-                <Text style={styles.lessonsText}>• {course.lessonCount} lessons</Text>
+                <Text style={styles.lessonsText}>• {course.lessonCount} bài học</Text>
               </View>
             </View>
 
             <View style={styles.tabsContainer}>
-              {['OVERVIEW', 'LESSONS', 'REVIEW'].map(tab => (
+              {['Tổng quan', 'Bài học', 'Đánh giá'].map(tab => (
                 <Pressable key={tab} style={styles.tabButton} onPress={() => setActiveTab(tab)}>
                   <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>{tab}</Text>
                   {activeTab === tab && <View style={styles.tabIndicator} />}
@@ -170,18 +173,30 @@ useEffect(() => {
       </ScrollView>
 
       {!isFullScreen && (
-        <View style={styles.bottomBar}>
-          <View style={styles.priceContainer}>
-            <Text style={styles.priceCurrent}>${course.price}</Text>
-            <Text style={styles.priceDiscount}>${course.originalPrice}</Text>
+      <>
+        
+        {enrollmentLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : isEnrolled ? (
+            <></>
+        ) : (
+          <View style={styles.bottomBar}>
+            <View style={styles.priceContainer}>
+              <Text style={styles.priceCurrent}>${course.price}</Text>
+              {course.originalPrice > course.price && (
+                <Text style={styles.priceDiscount}>${course.originalPrice}</Text>
+              )}
+            </View>
+            <Pressable
+              style={styles.buyNowButton}
+              onPress={() => navigation.navigate('Payment', { course })}
+            >
+              <Text style={styles.buyNowText}>Mua ngay</Text>
+            </Pressable>
           </View>
-          <Pressable style={styles.buyNowButton}
-            onPress={() => { navigation.navigate('Payment', { course: {...course}}) }}
-          >
-            <Text style={styles.buyNowText}>Mua ngay</Text>
-          </Pressable>
-        </View>
-      )}
+        )}
+      </>
+    )}
     </SafeAreaView>
   );
 }

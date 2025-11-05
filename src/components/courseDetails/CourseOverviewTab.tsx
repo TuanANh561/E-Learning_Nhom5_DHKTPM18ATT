@@ -26,12 +26,12 @@ export default function CourseOverviewTab({ course, similarCourses }: Props) {
   }, []);
 
   const benefits = [
-    { icon: 'videocam-outline', txt: '14 hours on-demand video' },
-    { icon: 'globe-outline', txt: 'Native teacher' },
-    { icon: 'document-outline', txt: '100% free document' },
-    { icon: 'time-outline', txt: 'Full lifetime access' },
-    { icon: 'ribbon-outline', txt: 'Certificate of complete' },
-    { icon: 'headset-outline', txt: '24/7 support' },
+    { icon: 'videocam-outline', txt: '14 giờ video theo yêu cầu' },
+    { icon: 'globe-outline', txt: 'Giảng viên bản ngữ' },
+    { icon: 'document-outline', txt: 'Tài liệu 100% miễn phí' },
+    { icon: 'time-outline', txt: 'Truy cập trọn đời' },
+    { icon: 'ribbon-outline', txt: 'Chứng chỉ hoàn thành' },
+    { icon: 'headset-outline', txt: 'Hỗ trợ 24/7' },
   ];
 
   return (
@@ -44,23 +44,23 @@ export default function CourseOverviewTab({ course, similarCourses }: Props) {
           <Text style={st.tRole}>UI/UX Designer</Text>
         </View>
         <Pressable style={st.follow}>
-          <Text style={st.followTxt}>Follow</Text>
+          <Text style={st.followTxt}>Theo dõi</Text>
         </Pressable>
       </View>
 
       {/* Description */}
-      <Text style={st.sec}>Description</Text>
+      <Text style={st.sec}>Mô tả</Text>
       <Text style={st.desc} numberOfLines={full ? undefined : 3}>
         {course.description}
       </Text>
       {!full && (
         <Pressable onPress={() => setFull(true)}>
-          <Text style={st.more}>See more</Text>
+          <Text style={st.more}>Xem thêm</Text>
         </Pressable>
       )}
 
       {/* Benefits */}
-      <Text style={st.sec}>Benefits</Text>
+      <Text style={st.sec}>Lợi ích</Text>
       {benefits.map((b, i) => (
         <View key={i} style={st.ben}>
           <Ionicons name={b.icon as any} size={20} color="#00bfff" />
@@ -69,7 +69,7 @@ export default function CourseOverviewTab({ course, similarCourses }: Props) {
       ))}
 
       {/* Similar */}
-      <Text style={st.sec}>Similar courses</Text>
+      <Text style={st.sec}>Các khóa học tương tự</Text>
       <FlatList
         data={similarCourses}
         renderItem={({ item }) => <CourseCardVertical course={item} />}

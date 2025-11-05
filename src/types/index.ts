@@ -4,7 +4,7 @@ export type RootStackParamList = {
     Search: undefined;
     MyCourses: undefined;
     CourseDetail: { courseId: number };
-    Learning: { lessonId: number; courseId: number };
+    Learning: { lessonId: number; courseId: number; isEnrolled: boolean};
     CoursesByCategory: { categoryId: number; categoryName: string };
     TeacherProfile: { teacherId: number };
     CourseListScreen: { title: string };
@@ -57,7 +57,7 @@ export type Course = {
 
 export type Section = { 
 	id: number; 
-	course_id: number; 
+	courseId: number; 
 	title: string; 
 };
 
@@ -65,9 +65,10 @@ export type Lesson = {
     id: number;
     section_id: number;
     title: string;
-    duration_mins: number;
-    video_url: string;
-    is_free: boolean;
+    durationInSeconds: number;
+    playbackUrl: string;
+    isFree: boolean;
+    viewsCount: number;
 };
 
 export type Review = {
@@ -77,7 +78,7 @@ export type Review = {
     rating: number; 
     comment: string;
     userFullName: string;
-    userrAvatarUrl: string;
+    userAvatarUrl: string;
     createdAt: string;
 };
 

@@ -17,6 +17,7 @@ export default function LearningScreen() {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'Learning'>>();
   const lessonId = route.params.lessonId;
   const courseId = route.params.courseId;
+  const isEnrolled = route.params.isEnrolled;
 
   const [activeTab, setActiveTab] = useState<'lessons' | 'qa'>('lessons');
   const [currentLessonId, setCurrentLessonId] = useState(lessonId);
@@ -40,7 +41,7 @@ export default function LearningScreen() {
     loadData();
   }, [lessonId, courseId]);
 
-  const player = useVideoPlayer(currentLesson?.video_url || '', player => {
+  const player = useVideoPlayer(currentLesson?.playbackUrl || '', player => {
     player.pause();
   });
 
@@ -61,6 +62,7 @@ export default function LearningScreen() {
             courseId={courseId}
             currentLessonId={currentLessonId}
             onLessonPress={handleLessonPress}
+            isEnrolled={isEnrolled}
           />
         );
       case 'qa':
@@ -102,12 +104,16 @@ export default function LearningScreen() {
 
         <View style={styles.courseInfoContainer}>
           <Text style={styles.courseMainTitle}>
-            {currentCourse.title}: {currentLesson.title}
+            {currentCourse.title}: {currentLesson?.title}
           </Text>
           <View style={styles.actionsBar}>
             <View style={styles.actionItem}>
-              <Ionicons name="heart-outline" size={20} color="red" />
-              <Text style={styles.actionText}>231 Like</Text>
+              <View style={styles.rating}>
+                <Text style={styles.ratingText}>
+                  <Ionicons name="star" size={16} color="#FFD700" /> 
+                  {currentCourse.ratingAvg.toFixed(1)} ({currentCourse.ratingCount})
+                </Text>
+              </View>
             </View>
           </View>
         </View>
@@ -163,4 +169,6 @@ const styles = StyleSheet.create({
   activeTab: { borderBottomWidth: 2, borderColor: '#00bfff' },
   tabLabel: { fontSize: 13, fontWeight: 'bold', color: '#666' },
   activeTabLabel: { color: '#00bfff' },
+  rating: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 },
+  ratingText: { fontSize: 14, color: '#666' },
 });

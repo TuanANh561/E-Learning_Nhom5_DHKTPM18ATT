@@ -4,14 +4,15 @@ import { Ionicons } from '@expo/vector-icons';
 import useCourseLessons from '../../hooks/useCourseLessons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../types';
+import { Lesson, RootStackParamList } from '../../types';
 
 type Props = {
   courseId: number;
   onLessonPressPause?: () => void;
+  isEnrolled: boolean;
 };
 
-export default function CourseLessonsTab({ courseId, onLessonPressPause }: Props) {
+export default function CourseLessonsTab({ courseId, onLessonPressPause, isEnrolled }: Props) {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'Learning'>>();
   const { sections, loading } = useCourseLessons(courseId);
   const [openSections, setOpenSections] = useState<Record<number, boolean>>({});
@@ -20,10 +21,10 @@ export default function CourseLessonsTab({ courseId, onLessonPressPause }: Props
     setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleLessonPress = (lesson: any) => {
-    if (lesson.is_free) {
+  const handleLessonPress = (lesson: Lesson) => {
+    if (lesson.isFree || isEnrolled) {
       onLessonPressPause?.();
-      navigation.navigate('Learning', { lessonId: lesson.id, courseId });
+      navigation.navigate('Learning', { lessonId: lesson.id, courseId, isEnrolled});
     } else {
       Alert.alert('Bài học chỉ dành cho học viên đã mua khóa học!');
     }
@@ -49,7 +50,7 @@ export default function CourseLessonsTab({ courseId, onLessonPressPause }: Props
             </Pressable>
 
             {isOpen &&
-              section.lessons.map((lesson: any, idx: number) => (
+              section.lessons.map((lesson: Lesson, idx: number) => (
                 <Pressable
                   key={lesson.id}
                   style={styles.lessonItem}
@@ -58,12 +59,12 @@ export default function CourseLessonsTab({ courseId, onLessonPressPause }: Props
                   <Text style={styles.lessonNumber}>{String(idx + 1).padStart(2, '0')}</Text>
                   <View style={styles.lessonInfo}>
                     <Text style={styles.lessonTitle}>{lesson.title}</Text>
-                    <Text style={styles.duration}>{lesson.duration_mins.toFixed(2)} mins</Text>
+                    <Text style={styles.duration}>{(lesson.durationInSeconds / 60).toFixed(2)} phút</Text>
                   </View>
                   <Ionicons
-                    name={lesson.is_free ? 'play-circle-outline' : 'lock-closed-outline'}
+                    name={lesson.isFree || isEnrolled ? 'play-circle-outline' : 'lock-closed-outline'}
                     size={20}
-                    color={lesson.is_free ? '#00bfff' : '#999'}
+                    color={lesson.isFree || isEnrolled ? '#00bfff' : '#999'}
                   />
                 </Pressable>
               ))}

@@ -8,9 +8,10 @@ interface LessonsTabProps {
   courseId: number;
   currentLessonId: number;
   onLessonPress: (lesson: Lesson) => void;
+  isEnrolled: boolean;
 }
 
-export default function LessonsTab({ courseId, currentLessonId, onLessonPress,}: LessonsTabProps) {
+export default function LessonsTab({ courseId, currentLessonId, onLessonPress, isEnrolled}: LessonsTabProps) {
   const { sections, loading } = useCourseLessons(courseId);
   const [openSections, setOpenSections] = useState<Record<number, boolean>>({});
 
@@ -31,7 +32,7 @@ export default function LessonsTab({ courseId, currentLessonId, onLessonPress,}:
   };
 
   const handleLessonPress = (lesson: Lesson) => {
-    if (lesson.is_free) {
+    if (lesson.isFree || isEnrolled) {
       onLessonPress(lesson);
     } else {
       Alert.alert( 'Khóa học bị khóa', 'Bài học này chỉ dành cho học viên đã mua khóa học!',
@@ -69,11 +70,11 @@ export default function LessonsTab({ courseId, currentLessonId, onLessonPress,}:
                     <Text style={styles.lessonNumber}> {(idx + 1).toString().padStart(2, '0')}</Text>
                     <View style={styles.lessonInfo}>
                       <Text style={styles.lessonTitle}>{lesson.title}</Text>
-                      <Text style={styles.duration}> {lesson.duration_mins.toFixed(1)} phút</Text>
+                      <Text style={styles.duration}> {(lesson.durationInSeconds / 60).toFixed(1)} phút</Text>
                     </View>
-                    <Ionicons name={ isActive ? 'play-circle' : lesson.is_free ? 'play-circle-outline' : 'lock-closed-outline'}
+                    <Ionicons name={ isActive ? 'play-circle' : lesson.isFree || isEnrolled ? 'play-circle-outline' : 'lock-closed-outline'}
                       size={20}
-                      color={ isActive ? '#00bfff' : lesson.is_free ? '#00bfff' : '#999'}
+                      color={ isActive ? '#00bfff' : lesson.isFree || isEnrolled ? '#00bfff' : '#999'}
                     />
                   </Pressable>
                 );
