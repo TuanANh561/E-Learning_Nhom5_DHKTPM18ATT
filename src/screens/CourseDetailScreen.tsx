@@ -1,14 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { ScrollView, View, Text, StyleSheet, Pressable, Dimensions, ActivityIndicator,} from 'react-native';
+import { ScrollView, View, Text, StyleSheet, Pressable, Dimensions, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { VideoView, useVideoPlayer } from 'expo-video';
-
 import useCourses from '../hooks/useCourses';
 import useUsers from '../hooks/useUsers';
 import useReviews from '../hooks/useReviews';
-
+import { Course, User, Review } from '../types';
 import CourseOverviewTab from '../components/courseDetails/CourseOverviewTab';
 import CourseLessonsTab from '../components/courseDetails/CourseLessonsTab';
 import CourseReviewTab from '../components/courseDetails/CourseReviewTab';
@@ -22,24 +21,61 @@ export default function CourseDetailScreen() {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'CourseDetail'>>();
   const courseId = Number(route.params.courseId);
 
-  const { courses, loading: coursesLoading } = useCourses();
-  const { users, loading: usersLoading } = useUsers();
-  const { reviews, loading: reviewsLoading } = useReviews();
+  const { fetchCourseById, fetchByCategoryId, loading: coursesLoading } = useCourses();
+  const { reviews, loading: reviewsLoading, fetchReviewByCourseId } = useReviews();
+
+  const [course, setCourse] = useState<Course>();
+  const [similarCourses, setSimilarCourses] = useState<Course[]>([]);
+  const [courseReviews, setCourseReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [activeTab, setActiveTab] = useState('OVERVIEW');
   const [isFullScreen, setIsFullScreen] = useState(false);
 
-  const course = useMemo(() => courses.find(c => Number(c.id) === courseId), [courses, courseId]);
-  const teacher = useMemo(() => users.find(u => Number(u.id) === course?.teacher_id), [users, course]);
-  const similarCourses = useMemo(
-    () => courses.filter(c => c.category_id === course?.category_id && c.id !== courseId).slice(0, 3),
-    [courses, courseId, course]
-  );
+useEffect(() => {
+  if (!courseId) return;
 
-  const courseReviews = useMemo(() => reviews.filter(r => r.course_id === courseId), [reviews, courseId]);
+  const loadData = async () => {
+    setLoading(true);
+
+    try {
+      const course = await fetchCourseById(courseId);
+      if (!course) {
+        Alert.alert('Lỗi', 'Không tìm thấy khóa học');
+        setLoading(false);
+        return;
+      }
+      setCourse(course);
+
+      try {
+        const res = await fetchReviewByCourseId(courseId, 1, 20);
+        setCourseReviews(res.data || []);
+      } catch {
+        setCourseReviews([]);
+      }
+
+      if (course.categoryId) {
+        try {
+          const res = await fetchByCategoryId(course.categoryId, 1, 10);
+          const filtered = res.data.filter(c => c.id !== courseId).slice(0, 5);
+          setSimilarCourses(filtered);
+        } catch {
+          setSimilarCourses([]);
+        }
+      }
+
+    } catch {
+      Alert.alert('Lỗi', 'Không thể tải dữ liệu');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadData();
+}, [courseId]);
 
   const player = useVideoPlayer(
-    course?.video_url_preview || 'https://www.w3schools.com/html/mov_bbb.mp4',
+    course?.videoPreviewUrl || 'https://www.w3schools.com/html/mov_bbb.mp4',
     (player) => {
       player.pause();
     }
@@ -50,12 +86,6 @@ export default function CourseDetailScreen() {
       player.pause();
     }
   };
-
-  useEffect(() => {
-    if (!coursesLoading && !reviewsLoading) {
-      setActiveTab('OVERVIEW');
-    }
-  }, [coursesLoading, reviewsLoading]);
 
   if (!courseId) {
     return (
@@ -70,14 +100,14 @@ export default function CourseDetailScreen() {
     );
   }
 
-  if (coursesLoading || usersLoading || reviewsLoading || !course) {
+  if (coursesLoading || reviewsLoading || !course) {
     return <ActivityIndicator size="large" color="#00bfff" style={styles.loading} />;
   }
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'OVERVIEW':
-        return <CourseOverviewTab course={course} teacher={teacher} similarCourses={similarCourses} />;
+        return <CourseOverviewTab course={course} similarCourses={similarCourses} />;
       case 'LESSONS':
         return <CourseLessonsTab courseId={courseId} onLessonPressPause={handlePauseVideo}  />;
       case 'REVIEW':
@@ -116,8 +146,11 @@ export default function CourseDetailScreen() {
             <View style={styles.mainInfoContainer}>
               <Text style={styles.courseTitle}>{course.title}</Text>
               <View style={styles.ratingRow}>
-                <Text style={styles.ratingText}>★ {course.rating_avg.toFixed(1)} ({course.rating_count})</Text>
-                <Text style={styles.lessonsText}>• {course.lesson_count} lessons</Text>
+                <Text style={styles.ratingText}>
+                  <Ionicons name="star" size={16} color="#FFD700" /> 
+                  {course.ratingAvg.toFixed(1)} ({course.ratingCount})
+                </Text>
+                <Text style={styles.lessonsText}>• {course.lessonCount} lessons</Text>
               </View>
             </View>
 
@@ -140,10 +173,10 @@ export default function CourseDetailScreen() {
         <View style={styles.bottomBar}>
           <View style={styles.priceContainer}>
             <Text style={styles.priceCurrent}>${course.price}</Text>
-            <Text style={styles.priceDiscount}>${course.original_price}</Text>
+            <Text style={styles.priceDiscount}>${course.originalPrice}</Text>
           </View>
           <Pressable style={styles.buyNowButton}
-            onPress={() => { navigation.navigate('Payment', { course: {...course, teacher_name: teacher?.full_name || 'undefined'} }) }}
+            onPress={() => { navigation.navigate('Payment', { course: {...course}}) }}
           >
             <Text style={styles.buyNowText}>Mua ngay</Text>
           </Pressable>

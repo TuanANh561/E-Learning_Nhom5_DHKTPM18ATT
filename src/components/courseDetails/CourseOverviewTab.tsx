@@ -1,18 +1,29 @@
-// src/components/courseDetails/CourseOverviewTab.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, Pressable, FlatList, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CourseCardVertical from '../course/CourseCardVertical';
 import { Course, User } from '../../types';
+import useUsers from '../../hooks/useUsers';
 
 interface Props {
   course: Course;
-  teacher?: User;
   similarCourses: Course[];
 }
 
-export default function CourseOverviewTab({ course, teacher, similarCourses }: Props) {
+export default function CourseOverviewTab({ course, similarCourses }: Props) {
   const [full, setFull] = useState(false);
+
+  const { fetchTeacherById } = useUsers();
+  const [teacher, setTeacher] = useState<User | null>(null);
+
+  const fetchTeacher = async () => {
+    const teacherData = await fetchTeacherById(course.instructorId);
+    setTeacher(teacherData);
+  };
+
+  useEffect(() => {
+    fetchTeacher();
+  }, []);
 
   const benefits = [
     { icon: 'videocam-outline', txt: '14 hours on-demand video' },
@@ -27,9 +38,9 @@ export default function CourseOverviewTab({ course, teacher, similarCourses }: P
     <View style={st.container}>
       {/* Teacher */}
       <View style={st.teacher}>
-        <Image source={{ uri: teacher?.avatar_url || 'https://via.placeholder.com/50' }} style={st.avatar} />
+        <Image source={{ uri: teacher?.avatarUrl || 'https://via.placeholder.com/50' }} style={st.avatar} />
         <View style={st.tInfo}>
-          <Text style={st.tName}>{teacher?.full_name || 'Loading…'}</Text>
+          <Text style={st.tName}>{teacher?.fullName || 'Loading…'}</Text>
           <Text style={st.tRole}>UI/UX Designer</Text>
         </View>
         <Pressable style={st.follow}>

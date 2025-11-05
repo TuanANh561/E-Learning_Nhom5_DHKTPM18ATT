@@ -17,9 +17,9 @@ export default function TeacherCard({ teacher }: TeacherCardProps) {
 
 	return (
 		<Pressable onPress={handlePress} style={styles.container}>
-			<Image source={{ uri: teacher.avatar_url }} style={styles.avatar} />
+			<Image source={{ uri: teacher.avatarUrl }} style={styles.avatar} />
 			<View style={styles.info}>
-				<Text style={styles.name}>{teacher.full_name}</Text>
+				<Text style={styles.name}>{teacher.fullName}</Text>
 				<Text style={styles.rating}>★ 4.5 (1233)</Text>
 			</View>
 		</Pressable>

@@ -20,7 +20,7 @@ export default function CategoryListSearch({ categories, onCategoryPress }: Cate
             
         {displayedCategories.map((cat) => (
             <Pressable key={cat.id} style={styles.categoryItem} onPress={() => onCategoryPress(cat.name)}>
-                <Ionicons name={cat.icon_name as any} size={24} color="#00bfff" style={styles.categoryIcon} />
+                <Ionicons name={cat.iconName as any} size={24} color="#00bfff" style={styles.categoryIcon} />
                 <Text style={styles.categoryText}>{cat.name}</Text>
                 <Ionicons name="chevron-forward-outline" size={20} color="#666" />
             </Pressable>

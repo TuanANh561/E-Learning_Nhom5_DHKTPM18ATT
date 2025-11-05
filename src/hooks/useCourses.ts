@@ -4,7 +4,6 @@ import { Course } from '../types';
 import { API_URL } from './api';
 
 export default function useCourses() {
-	const [courses, setCourses] = useState<Course[]>([]);
 	const [popular, setPopular] = useState<Course[]>([]);
  	const [recommended, setRecommended] = useState<Course[]>([]);
   	const [inspiring, setInspiring] = useState<Course[]>([]);
@@ -15,11 +14,9 @@ export default function useCourses() {
 		setLoading(true);
 		setError(null);
 		try {
-			const res = await axios.get(API_URL.courses);
 			const popularRes = await axios.get(API_URL.popularCourses);
 			const recommendedRes = await axios.get(API_URL.recommendedCourses);
 			const inspiringRes = await axios.get(API_URL.inspiringCourses);
-			setCourses(res.data);
 			setPopular(popularRes.data);
 			setRecommended(recommendedRes.data);
 			setInspiring(inspiringRes.data);
@@ -40,14 +37,14 @@ export default function useCourses() {
 		}
 	}, []);
 
-	const fetchByCategoryId = useCallback(async (categoryId: number, page: number = 1, limit: number = 6) => {
+	const fetchByCategoryId = useCallback(async (categoryId: number, page: number, limit: number) => {
 		setLoading(true);
 		setError(null);
 		try {
-			const res = await axios.get(`${API_URL.courses}?category_id=${categoryId}&_page=${page}&_limit=${limit}`);
+			const res = await axios.get(`${API_URL.courses}/by-category?category_id=${categoryId}&_page=${page}&_limit=${limit}`);
 			return {
-				data: res.data as Course[],
-				total: parseInt(res.headers['x-total-count'] || res.data.length, 10),
+				data: res.data.courses as Course[], 
+				total: res.data.total as number,
 				page,
 				limit,
 			};
@@ -57,18 +54,18 @@ export default function useCourses() {
 		} finally {
 			setLoading(false);
 		}
-	},[]);
+	}, []);
 
 	const fetchByTeacherId = useCallback(async (teacherId: number, page: number = 1, limit: number = 6) => {
       setLoading(true);
       setError(null);
       try {
         const res = await axios.get(
-          `${API_URL.courses}?teacher_id=${teacherId}&_page=${page}&_limit=${limit}`
+          `${API_URL.courses}/by-instructor?instructor_id=${teacherId}&_page=${page}&_limit=${limit}`
         );
         return {
-          data: res.data as Course[],
-          total: parseInt(res.headers['x-total-count'] || res.data.length, 10),
+          data: res.data.courses as Course[],
+          total: res.data.total as number,
           page,
           limit,
         };
@@ -84,5 +81,5 @@ export default function useCourses() {
 		fetchData();
 	}, [fetchData]);
 
-	return { courses, popular, recommended, inspiring, loading, error, refetch: fetchData, fetchCourseById, fetchByCategoryId, fetchByTeacherId };
+	return { popular, recommended, inspiring, loading, error, refetch: fetchData, fetchCourseById, fetchByCategoryId, fetchByTeacherId };
 }

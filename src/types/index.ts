@@ -8,50 +8,51 @@ export type RootStackParamList = {
     CoursesByCategory: { categoryId: number; categoryName: string };
     TeacherProfile: { teacherId: number };
     CourseListScreen: { title: string };
-    Payment: { course: Course & { teacher_name: string } };
+    Payment: { course: Course };
     Login: undefined;
     Register: undefined;
     Profile: { isLoggedIn?: boolean; userId?: number };
 };
 
 export type RootTabParamList = {
-  Home: undefined;
-  Search: undefined;
-  MyCourses: undefined;
-  Profile: undefined;
+  HomeTab: undefined;
+  SearchTab: undefined;
+  MyCoursesTab: undefined;
+  ProfileTab: undefined;
 };
 
 export type User = {
 	id: number;
 	username: string;
-	full_name: string;
+	fullName: string;
 	email: string;
 	password: string;
 	role: string;
-	avatar_url: string;
+	avatarUrl: string;
 };
 
 export type Category = {
 	id: number;
 	name: string;
-	image_Url: string;
-	icon_name: string;
+	imageUrl: string;
+	iconName: string;
 };
 
 export type Course = {
 	id: number;
 	title: string;
 	description: string;
-	category_id: number;
-	teacher_id: number;
-	thumbnail: string;
+	categoryName: string;
+  categoryId: number;
+	instructorName: string;
+  instructorId: number;
+	thumbnailUrl: string;
 	price: number;
-	rating_avg: number;
-    rating_count: number;
-    lesson_count: number;
-	original_price: number
-    video_url_preview?: string;
-    benefits: string[];
+  originalPrice: number
+	ratingAvg: number;
+  ratingCount: number;
+  lessonCount: number;
+  videoPreviewUrl: string;
 };
 
 export type Section = { 
@@ -71,11 +72,13 @@ export type Lesson = {
 
 export type Review = {
     id: number;
-    course_id: number;
-    user_id: number;
+    courseId: number;
+    userId: number;
     rating: number; 
     comment: string;
-    date: string;
+    userFullName: string;
+    userrAvatarUrl: string;
+    createdAt: string;
 };
 
 export interface Favorite {

@@ -39,26 +39,25 @@ export default function PaymentScreen() {
         <View style={{ width: 24 }} />
       </View>
 
-      {/* SCROLLVIEW - NỘI DUNG KÉO ĐƯỢC */}
       <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Thông tin khóa học */}
         <View style={styles.courseCard}>
-          <Image source={{ uri: course.thumbnail }} style={styles.thumbnail} />
+          <Image source={{ uri: course.thumbnailUrl }} style={styles.thumbnail} />
           <View style={styles.courseInfo}>
             <Text style={styles.courseTitle} numberOfLines={2}>{course.title}</Text>
-            <Text style={styles.teacherName}>Giảng viên: {course.teacher_name}</Text>
+            <Text style={styles.teacherName}>Giảng viên: {course.instructorName}</Text>
           </View>
         </View>
 
         {/* Giá tiền */}
         <View style={styles.priceSection}>
           <Text style={styles.label}>Giá gốc</Text>
-          <Text style={styles.price}>${course.original_price}</Text>
+          <Text style={styles.price}>${course.originalPrice}</Text>
         </View>
-        {course.original_price > course.price && (
+        {course.originalPrice > course.price && (
           <View style={styles.priceSection}>
             <Text style={styles.label}>Giảm giá</Text>
-            <Text style={styles.discount}>-${course.original_price - course.price}</Text>
+            <Text style={styles.discount}>-${course.originalPrice - course.price}</Text>
           </View>
         )}
         <View style={styles.totalSection}>

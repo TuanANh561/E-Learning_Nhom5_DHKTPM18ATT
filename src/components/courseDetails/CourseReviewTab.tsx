@@ -1,9 +1,7 @@
-// src/components/courseDetails/CourseReviewTab.tsx
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, Pressable, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Review, User, Course } from '../../types';
-import useUsers from '../../hooks/useUsers';
 
 interface Props {
   reviews: Review[];
@@ -11,20 +9,18 @@ interface Props {
 }
 
 export default function CourseReviewTab({ reviews, course }: Props) {
-  const { users } = useUsers();
   const [filter, setFilter] = useState<number | 'All'>('All');
   const filtered = filter === 'All' ? reviews : reviews.filter(r => r.rating === filter);
 
   const renderReview = ({ item }: { item: Review }) => {
-    
-    const user = users.find(u => Number(u.id) === item.user_id);
+
     return (
       <View style={styles.review}>
-        <Image source={{ uri: user?.avatar_url || 'https://via.placeholder.com/40' }} style={styles.avatar} />
+        <Image source={{ uri: item.userrAvatarUrl || 'https://via.placeholder.com/40' }} style={styles.avatar} />
         <View style={styles.content}>
           <View style={styles.header}>
-            <Text style={styles.name}>{user?.full_name || 'Unknown'}</Text>
-            <Text style={styles.date}>{item.date}</Text>
+            <Text style={styles.name}>{item.userFullName || 'Unknown'}</Text>
+            <Text style={styles.date}>{item.createdAt}</Text>
           </View>
           <View style={styles.stars}>
             {[...Array(5)].map((_, i) => (
@@ -42,7 +38,7 @@ export default function CourseReviewTab({ reviews, course }: Props) {
       <View style={styles.summary}>
         <View style={styles.rating}>
           <Ionicons name="star" size={20} color="#ffd700" />
-          <Text style={styles.avg}>{course.rating_avg.toFixed(1)}/5 ({course.rating_count}+ reviews)</Text>
+          <Text style={styles.avg}>{course.ratingAvg.toFixed(1)}/5 ({course.ratingCount}+ reviews)</Text>
         </View>
         <Pressable><Text style={styles.viewAll}>View all</Text></Pressable>
       </View>

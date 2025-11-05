@@ -1,10 +1,9 @@
 import { Course, RootStackParamList, User } from '../../types';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useMemo, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import useUsers from '../../hooks/useUsers';
 
 type CourseCardVerticalProps = {
   course: Course;
@@ -12,12 +11,6 @@ type CourseCardVerticalProps = {
 
 export default function CourseCardVertical({ course }: CourseCardVerticalProps) {
   const [isSaved, setIsSaved] = useState(false);
-  const { users } = useUsers();
-
-  const teacher = useMemo(
-    () => users.find((u) => Number(u.id) === course.teacher_id && u.role === 'TEACHER'),
-    [course.teacher_id, users]
-  );
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'CourseDetail'>>();
   const handlePress = useCallback(() => {
@@ -30,7 +23,7 @@ export default function CourseCardVertical({ course }: CourseCardVerticalProps) 
 
   return (
     <Pressable onPress={handlePress} style={styles.container}>
-      <Image source={{ uri: course.thumbnail }} style={styles.thumbnail} />
+      <Image source={{ uri: course.thumbnailUrl }} style={styles.thumbnail} />
       <View style={styles.info}>
         <View style={styles.titleRow}>
           <Text style={styles.title} numberOfLines={1}>{course.title}</Text>
@@ -38,11 +31,14 @@ export default function CourseCardVertical({ course }: CourseCardVerticalProps) 
             <Ionicons name={isSaved ? "bookmark" : "bookmark-outline"} size={24} color={isSaved ? "#00bfff" : "#666"} />
           </Pressable>
         </View>
-        <Text style={styles.teacher}>{teacher ? teacher.full_name : 'Unknown'}</Text>
-        <Text style={styles.price}>${course.price}</Text>
+        <Text style={styles.teacher}>{course.instructorName}</Text>
+        <Text style={styles.price}> {course.price.toLocaleString()} VNĐ</Text>
         <View style={styles.rating}>
-          <Text style={styles.ratingText}>★ {course.rating_avg.toFixed(1)} ({course.rating_count})</Text>
-          <Text style={styles.lessons}>• {course.lesson_count} bài học</Text>
+          <Text style={styles.ratingText}>
+            <Ionicons name="star" size={16} color="#FFD700" /> 
+            {course.ratingAvg.toFixed(1)} ({course.ratingCount})
+          </Text>
+          <Text style={styles.lessons}>• {course.lessonCount} bài học</Text>
         </View>
       </View>
     </Pressable>

@@ -71,10 +71,10 @@ export default function AppNavigator() {
           headerShown: false, 
         }}
       >
-        <Tab.Screen name="Home" component={HomeStack} options={{ tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} /> }} />
-        <Tab.Screen name="Search" component={SearchStack} options={{ tabBarIcon: ({ color }) => <Ionicons name="search" size={24} color={color} /> }} />
-        <Tab.Screen name="MyCourses" component={MyCoursesStack} options={{ tabBarIcon: ({ color }) => <Ionicons name="book" size={24} color={color} /> }} />
-        <Tab.Screen name="Profile" component={ProfileStack} options={{ tabBarIcon: ({ color }) => <Ionicons name="person" size={24} color={color} /> }} />
+        <Tab.Screen name="HomeTab" component={HomeStack} options={{tabBarLabel: 'Trang chủ', tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} /> }} />
+        <Tab.Screen name="SearchTab" component={SearchStack} options={{tabBarLabel: 'Tìm kiếm', tabBarIcon: ({ color }) => <Ionicons name="search" size={24} color={color} /> }} />
+        <Tab.Screen name="MyCoursesTab" component={MyCoursesStack} options={{tabBarLabel: 'Khóa học của tôi', tabBarIcon: ({ color }) => <Ionicons name="book" size={24} color={color} /> }} />
+        <Tab.Screen name="ProfileTab" component={ProfileStack} options={{tabBarLabel: 'Hồ sơ', tabBarIcon: ({ color }) => <Ionicons name="person" size={24} color={color} /> }} />
       </Tab.Navigator>
     </NavigationContainer>
   );

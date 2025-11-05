@@ -28,12 +28,8 @@ export default function useUsers() {
 
 	  const fetchTeacherById = useCallback(async (id: number) => {
 		try {
-			const res = await axios.get<User>(`${API_URL.users}/${id}`);
-			if (res.data.role === 'TEACHER') {
-				return res.data;
-			} else {
-				return null;
-			}
+			const res = await axios.get<User>(`${API_URL.users}/teacher/${id}`);
+			return res.data;
 		} catch (err) {
 			console.error('Không tìm thấy teacher:', err);
 			return null;

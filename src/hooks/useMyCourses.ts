@@ -12,9 +12,7 @@ export default function useMyCourses() {
   const fetchCourses = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get<MyCourse[]>(
-        `${API_URL.myCourses}?user_id=${USER_ID}`
-      );
+      const res = await axios.get<MyCourse[]>(`${API_URL.myCourses}?user_id=${USER_ID}`);
       setCourses(res.data);
     } catch (error) {
       console.error('Error fetching my courses:', error);
@@ -28,9 +26,5 @@ export default function useMyCourses() {
     fetchCourses();
   }, [fetchCourses]);
 
-  return {
-    courses,
-    loading,
-    refetch: fetchCourses,
-  };
+  return { courses, loading, refetch: fetchCourses};
 }

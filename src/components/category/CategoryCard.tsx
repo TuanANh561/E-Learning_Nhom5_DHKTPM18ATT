@@ -24,7 +24,7 @@ export default function CategoryCard({ category }: CategoryCardProps) {
 
   return (
     <Pressable onPress={handlePress} style={[styles.container, { backgroundColor: bgColor }]}>
-      <Image source={{ uri: category.image_Url }} style={{ width: 50, height: 50, marginBottom: 10 }} />
+      <Image source={{ uri: category.imageUrl }} style={{ width: 50, height: 50, marginBottom: 10 }} />
       <Text style={styles.text}>{category.name}</Text>
     </Pressable>
   );
