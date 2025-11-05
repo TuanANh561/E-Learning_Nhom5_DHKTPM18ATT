@@ -127,10 +127,10 @@ export default function UserProfileScreen() {
                 style={styles.coverImage}
               />
               <Image
-                source={{ uri: currentUser?.avatar_url }}
+                source={{ uri: currentUser?.avatarUrl }}
                 style={styles.profileAvatar}
               />
-              <Text style={styles.profileName}>{currentUser?.full_name}</Text>
+              <Text style={styles.profileName}>{currentUser?.fullName}</Text>
               <Text style={styles.profileRole}>Học viên</Text>
             </View>
 

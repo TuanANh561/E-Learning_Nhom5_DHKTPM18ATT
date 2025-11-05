@@ -104,13 +104,13 @@ export type LessonProgress = {
 };
 
 export type MyCourse = {
-  user_id?: number;
   id: number;
+  studentId: number;
   title: string;
-  thumbnail: string;
-  lesson_count: number;
-  completed_count: number;
-  progress_percent: number;
+  thumbnailUrl: string;
+  lessonCount: number;
+  completedLessons: number;
+  progressPercentage: number;
 };
 
 export type Quiz = {

@@ -42,7 +42,6 @@ export default function CoursesByCategoryScreen() {
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  // Hiển thị số trang đơn giản: có thể next/prev hoặc chọn trang
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}

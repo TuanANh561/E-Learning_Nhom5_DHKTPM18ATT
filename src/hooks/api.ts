@@ -8,7 +8,7 @@ export const API_URL = {
   courses: `${BASE_URL}/courses`,
   sections: `${BASE_URL}/sections`,
   lessons: `${BASE_URL}/lessons`,
-  myCourses: `${BASE_URL}/my-courses`,
+  myCourses: `${BASE_URL}/courses/my-courses`,
   users: `${BASE_URL}/users`,
   reviews: `${BASE_URL}/api/reviews`,
   favorites: `${BASE_URL}/favorites`,
