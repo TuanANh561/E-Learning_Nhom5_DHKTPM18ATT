@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, Pressable, FlatList, StyleSheet } from 'react-native';
+import { View, Text, Image, Pressable, FlatList, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CourseCardVertical from '../course/CourseCardVertical';
 import { Course, User } from '../../types';
@@ -38,7 +38,7 @@ export default function CourseOverviewTab({ course, similarCourses }: Props) {
     <View style={st.container}>
       {/* Teacher */}
       <View style={st.teacher}>
-        <Image source={{ uri: teacher?.avatarUrl || 'https://via.placeholder.com/50' }} style={st.avatar} />
+        <Image source={{ uri: teacher?.avatarUrl }} style={st.avatar} />
         <View style={st.tInfo}>
           <Text style={st.tName}>{teacher?.fullName || 'Loading…'}</Text>
           <Text style={st.tRole}>UI/UX Designer</Text>

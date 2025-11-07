@@ -12,9 +12,11 @@ import { RootStackParamList, RootTabParamList } from './src/types';
 import CoursesByCategoryScreen from './src/screens/CoursesByCategoryScreen';
 import TeacherProfileScreen from './src/screens/TeacherProfileScreen';
 import CourseListScreen from './src/screens/CourseListScreen';
-import PaymentScreen from './src/screens/PaymentScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
+import ConfirmOrderScreen from './src/screens/ConfirmOrderScreen';
+import PaymentScreen from './src/screens/PaymentScreen';
+import PurchaseSuccessScreen from './src/screens/PurchaseSuccessScreen';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -27,7 +29,11 @@ const HomeStack = () => (
     <Stack.Screen name="CoursesByCategory" component={CoursesByCategoryScreen} />
     <Stack.Screen name="TeacherProfile" component={TeacherProfileScreen} />
     <Stack.Screen name="CourseListScreen" component={CourseListScreen} />
+    <Stack.Screen name="ConfirmOrder" component={ConfirmOrderScreen} />
     <Stack.Screen name="Payment" component={PaymentScreen} />
+    <Stack.Screen name="PurchaseSuccess" component={PurchaseSuccessScreen} />
+    <Stack.Screen name="Login" component={LoginScreen} />
+    <Stack.Screen name="Register" component={RegisterScreen} />
   </Stack.Navigator>
 );
 
@@ -37,7 +43,11 @@ const SearchStack = () => (
     <Stack.Screen name="CourseDetail" component={CourseDetailScreen} />
     <Stack.Screen name="Learning" component={LearningScreen} />
     <Stack.Screen name="CourseListScreen" component={CourseListScreen} />
+    <Stack.Screen name="ConfirmOrder" component={ConfirmOrderScreen} />
     <Stack.Screen name="Payment" component={PaymentScreen} />
+    <Stack.Screen name="PurchaseSuccess" component={PurchaseSuccessScreen} />
+    <Stack.Screen name="Login" component={LoginScreen} />
+    <Stack.Screen name="Register" component={RegisterScreen} />
   </Stack.Navigator>
 );
 
@@ -46,7 +56,11 @@ const MyCoursesStack = () => (
     <Stack.Screen name="MyCourses" component={MyCoursesScreen} />
     <Stack.Screen name="CourseDetail" component={CourseDetailScreen} />
     <Stack.Screen name="Learning" component={LearningScreen} />
+    <Stack.Screen name="ConfirmOrder" component={ConfirmOrderScreen} />
     <Stack.Screen name="Payment" component={PaymentScreen} />
+    <Stack.Screen name="PurchaseSuccess" component={PurchaseSuccessScreen} />
+    <Stack.Screen name="Login" component={LoginScreen} />
+    <Stack.Screen name="Register" component={RegisterScreen} />
   </Stack.Navigator>
 );
 
@@ -55,9 +69,11 @@ const ProfileStack = () => (
     <Stack.Screen name="Profile" component={ProfileScreen} />
     <Stack.Screen name="CourseDetail" component={CourseDetailScreen} />
     <Stack.Screen name="Learning" component={LearningScreen} />
-    <Stack.Screen name="Payment" component={PaymentScreen} />
+    <Stack.Screen name="ConfirmOrder" component={ConfirmOrderScreen} />
     <Stack.Screen name="Login" component={LoginScreen} />
     <Stack.Screen name="Register" component={RegisterScreen} />
+    <Stack.Screen name="Payment" component={PaymentScreen} />
+    <Stack.Screen name="PurchaseSuccess" component={PurchaseSuccessScreen} />
   </Stack.Navigator>
 );
 

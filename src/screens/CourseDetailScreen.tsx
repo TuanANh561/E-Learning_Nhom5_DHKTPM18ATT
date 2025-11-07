@@ -32,50 +32,51 @@ export default function CourseDetailScreen() {
   const [activeTab, setActiveTab] = useState('Tổng quan');
   const [isFullScreen, setIsFullScreen] = useState(false);
 
-  const CURRENT_USER_ID = 1;
-  const { isEnrolled, loading: enrollmentLoading } = useEnrollment(CURRENT_USER_ID, course?.id || null);
+  const userId = 1; // Giả lập user ở đây
+  const { isEnrolled, loading: enrollmentLoading } = useEnrollment(userId, course?.id || null);
 
-useEffect(() => {
-  if (!courseId) return;
 
-  const loadData = async () => {
-    setLoading(true);
+  useEffect(() => {
+    if (!courseId) return;
 
-    try {
-      const course = await fetchCourseById(courseId);
-      if (!course) {
-        Alert.alert('Lỗi', 'Không tìm thấy khóa học');
-        setLoading(false);
-        return;
-      }
-      setCourse(course);
+    const loadData = async () => {
+      setLoading(true);
 
       try {
-        const res = await fetchReviewByCourseId(courseId, 1, 20);
-        setCourseReviews(res.data || []);
-      } catch {
-        setCourseReviews([]);
-      }
-
-      if (course.categoryId) {
-        try {
-          const res = await fetchByCategoryId(course.categoryId, 1, 10);
-          const filtered = res.data.filter(c => c.id !== courseId).slice(0, 5);
-          setSimilarCourses(filtered);
-        } catch {
-          setSimilarCourses([]);
+        const course = await fetchCourseById(courseId);
+        if (!course) {
+          Alert.alert('Lỗi', 'Không tìm thấy khóa học');
+          setLoading(false);
+          return;
         }
+        setCourse(course);
+
+        try {
+          const res = await fetchReviewByCourseId(courseId, 1, 20);
+          setCourseReviews(res.data || []);
+        } catch {
+          setCourseReviews([]);
+        }
+
+        if (course.categoryId) {
+          try {
+            const res = await fetchByCategoryId(course.categoryId, 1, 10);
+            const filtered = res.data.filter(c => c.id !== courseId).slice(0, 5);
+            setSimilarCourses(filtered);
+          } catch {
+            setSimilarCourses([]);
+          }
+        }
+
+      } catch {
+        Alert.alert('Lỗi', 'Không thể tải dữ liệu');
+      } finally {
+        setLoading(false);
       }
+    };
 
-    } catch {
-      Alert.alert('Lỗi', 'Không thể tải dữ liệu');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  loadData();
-}, [courseId]);
+    loadData();
+  }, [courseId]);
 
   const player = useVideoPlayer(
     course?.videoPreviewUrl || 'https://www.w3schools.com/html/mov_bbb.mp4',
@@ -88,6 +89,27 @@ useEffect(() => {
     if (player && player.pause) {
       player.pause();
     }
+  };
+
+  const handleBuyNow = () => {
+    if (!userId) {
+      Alert.alert(
+        'Yêu cầu đăng nhập',
+        'Vui lòng đăng nhập để mua khóa học.',
+        [
+          { text: 'Hủy', style: 'cancel' },
+          { text: 'Đăng nhập', onPress: () => navigation.navigate('Login') },
+        ]
+      );
+      return;
+    }
+
+    if (!course) {
+      Alert.alert('Lỗi', 'Không tìm thấy thông tin khóa học.');
+      return;
+    }
+
+    navigation.navigate('ConfirmOrder', { course });
   };
 
   if (!courseId) {
@@ -122,7 +144,9 @@ useEffect(() => {
 
   return (
     <SafeAreaView style={styles.fullScreenContainer}>
-      <ScrollView style={styles.scrollView}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        style={styles.scrollView}>
         {!isFullScreen && (
           <View style={styles.header}>
             <Pressable onPress={() => navigation.goBack()}>
@@ -182,15 +206,12 @@ useEffect(() => {
         ) : (
           <View style={styles.bottomBar}>
             <View style={styles.priceContainer}>
-              <Text style={styles.priceCurrent}>${course.price}</Text>
+              <Text style={styles.priceCurrent}>{(course.price).toLocaleString()} VNĐ</Text>
               {course.originalPrice > course.price && (
-                <Text style={styles.priceDiscount}>${course.originalPrice}</Text>
+                <Text style={styles.priceDiscount}>{(course.originalPrice).toLocaleString()} VNĐ</Text>
               )}
             </View>
-            <Pressable
-              style={styles.buyNowButton}
-              onPress={() => navigation.navigate('Payment', { course })}
-            >
+            <Pressable style={styles.buyNowButton} onPress={handleBuyNow}>
               <Text style={styles.buyNowText}>Mua ngay</Text>
             </Pressable>
           </View>

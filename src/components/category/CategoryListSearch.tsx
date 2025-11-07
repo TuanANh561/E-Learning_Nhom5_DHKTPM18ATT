@@ -5,28 +5,38 @@ import { Category } from '../../types';
 
 interface CategoryListSearchProps {
     categories: Category[];
-    onCategoryPress: (topicName: string) => void; 
+    onCategoryPress: (categoryId: number, name: string) => void; 
 }
 
 export default function CategoryListSearch({ categories, onCategoryPress }: CategoryListSearchProps) {
 
-  const displayedCategories = categories.slice(0, 6);
+    const displayedCategories = categories.slice(0, 6);
 
-  return (
-    <View>
-        <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Danh mục</Text>
+    const handlePress = (cat: Category) => {
+        if (cat.id && cat.name) {
+             onCategoryPress(cat.id, cat.name);
+        }
+    }
+
+    return (
+        <View>
+            <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Danh mục</Text>
+            </View>
+                
+            {displayedCategories.map((cat) => (
+                <Pressable 
+                    key={cat.id} 
+                    style={styles.categoryItem} 
+                    onPress={() => handlePress(cat)} 
+                >
+                    <Ionicons name={cat.iconName as any} size={24} color="#00bfff" style={styles.categoryIcon} />
+                    <Text style={styles.categoryText}>{cat.name}</Text>
+                    <Ionicons name="chevron-forward-outline" size={20} color="#666" />
+                </Pressable>
+            ))}
         </View>
-            
-        {displayedCategories.map((cat) => (
-            <Pressable key={cat.id} style={styles.categoryItem} onPress={() => onCategoryPress(cat.name)}>
-                <Ionicons name={cat.iconName as any} size={24} color="#00bfff" style={styles.categoryIcon} />
-                <Text style={styles.categoryText}>{cat.name}</Text>
-                <Ionicons name="chevron-forward-outline" size={20} color="#666" />
-            </Pressable>
-        ))}
-    </View>
-);
+    );
 }
 
 const styles = StyleSheet.create({

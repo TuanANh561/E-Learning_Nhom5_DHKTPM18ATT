@@ -4,7 +4,6 @@ import useReviews from '../../hooks/useReviews';
 import { Ionicons } from '@expo/vector-icons';
 import { Review, Course } from '../../types';
 
-// === COMPONENT CON: ReviewItem ===
 const ReviewItem = React.memo(({ item }: { item: Review }) => {
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString('vi-VN', {
@@ -212,7 +211,7 @@ export default function CourseReviewTab({ reviews: initialReviews, course, isEnr
         renderItem={({ item }) => <ReviewItem item={item} />}
         keyExtractor={(item) => item.id.toString()}
         refreshing={refreshing}
-        onRefresh={handleRefresh}
+        scrollEnabled={false} 
         style={styles.reviewList}
         ListEmptyComponent={
           <Text style={{ textAlign: 'center', color: '#999', marginTop: 20 }}>

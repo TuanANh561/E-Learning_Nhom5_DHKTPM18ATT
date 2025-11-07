@@ -10,19 +10,6 @@ export default function useReviews() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const res = await axios.get(API_URL.reviews);
-            setReviews(res.data);
-        } catch (err: any) {
-            setError(err.message || 'Lỗi khi tải đánh giá');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
     const fetchReviewByCourseId = useCallback(async (courseId: number, page: number, limit: number): Promise<FetchByCourseResult> => {
         setLoading(true);
         setError(null);
@@ -42,20 +29,14 @@ export default function useReviews() {
         }
     }, []);
 
-    /**
-     * Fetch the current user's review for a specific course.
-     * Backend: GET /my-review-alt/{courseId}?user_id={userId}
-     */
     const fetchMyReview = useCallback(async (courseId: number, userId: number): Promise<Review | null> => {
         setLoading(true);
         setError(null);
         try {
             const url = `${API_URL.reviews}/my-review-alt/${courseId}?user_id=${userId}`;
             const res = await axios.get(url);
-            // Expecting a single Review response or 404 / empty
             return res.data as Review;
         } catch (err: any) {
-            // If not found, return null; otherwise set error
             if (err.response && err.response.status === 404) return null;
             setError(err.message || 'Lỗi khi lấy đánh giá của người dùng');
             return null;
@@ -105,9 +86,5 @@ export default function useReviews() {
         }
     }, []);
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
-
-    return { reviews, loading, error, refetch: fetchData, fetchReviewByCourseId, fetchMyReview, createReview, updateReview };
+    return { reviews, loading, error, fetchReviewByCourseId, fetchMyReview, createReview, updateReview };
 }

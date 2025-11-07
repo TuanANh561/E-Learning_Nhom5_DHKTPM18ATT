@@ -19,6 +19,8 @@ export default function LearningScreen() {
   const courseId = route.params.courseId;
   const isEnrolled = route.params.isEnrolled;
 
+  console.log(lessonId)
+
   const [activeTab, setActiveTab] = useState<'lessons' | 'qa'>('lessons');
   const [currentLessonId, setCurrentLessonId] = useState(lessonId);
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
@@ -41,7 +43,7 @@ export default function LearningScreen() {
     loadData();
   }, [lessonId, courseId]);
 
-  const player = useVideoPlayer(currentLesson?.playbackUrl || '', player => {
+  const player = useVideoPlayer( currentLesson?.playbackUrl || '', player => {
     player.pause();
   });
 

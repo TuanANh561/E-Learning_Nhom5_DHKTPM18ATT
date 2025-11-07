@@ -15,9 +15,11 @@ export default function useCourseLessons(courseId: number) {
     const fetchData = async () => {
       try {
         const res = await axios.get(`${API_URL.sections}/by-course?course_id=${courseId}`);
-        setSections(res.data);
+        const data = Array.isArray(res.data) ? res.data : [];
+        setSections(data);
       } catch (error) {
         console.error('Lỗi khi lấy dữ liệu sections/lessons:', error);
+        setSections([]);
       } finally {
         setLoading(false);
       }

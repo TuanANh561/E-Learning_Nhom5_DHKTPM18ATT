@@ -35,9 +35,6 @@ export default function useLessons() {
         fetchData();
     }, [fetchData]);
 
-    const getLessonsBySectionId = (sectionId: number): Lesson[] => {
-        return lessons.filter(lesson => lesson.section_id === sectionId);
-    };
 
-    return { lessons, loading, error, refetch: fetchData, fetchLessonById, getLessonsBySectionId };
+    return { lessons, loading, error, refetch: fetchData, fetchLessonById };
 }

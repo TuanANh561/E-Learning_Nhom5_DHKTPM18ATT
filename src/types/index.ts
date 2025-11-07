@@ -8,7 +8,9 @@ export type RootStackParamList = {
     CoursesByCategory: { categoryId: number; categoryName: string };
     TeacherProfile: { teacherId: number };
     CourseListScreen: { title: string };
+    ConfirmOrder: { course: Course };
     Payment: { course: Course };
+    PurchaseSuccess: { course: Course };
     Login: undefined;
     Register: undefined;
     Profile: { isLoggedIn?: boolean; userId?: number };

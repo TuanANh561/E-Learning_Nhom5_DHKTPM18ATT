@@ -54,7 +54,6 @@ export default function TeacherProfileScreen() {
     loadData();
   }, [teacherId, fetchTeacherById, loadTeacherCourses]);
 
-  // pages array for pagination buttons (1..totalPages), capped at 100 pages
   const pages = useMemo(() => {
     const totalPages = Math.min(Math.max(Math.ceil(total / limit), 1), 100);
     return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -76,7 +75,7 @@ export default function TeacherProfileScreen() {
       </View>
 
       <FlatList
-        data={activeTab === 'overview' ? teacherCourses.slice(0, 6) : teacherCourses}
+        data={activeTab === 'overview' ? (teacherCourses ?? [] ).slice(0, 6) : teacherCourses}
         renderItem={renderCourse}
         keyExtractor={item => item.id.toString()}
         ListHeaderComponent={

@@ -3,6 +3,7 @@ import { View, Text, Pressable, StyleSheet, ActivityIndicator, Alert } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 import { Lesson } from '../../types';
 import useCourseLessons from '../../hooks/useCourseLessons';
+import useLessonProgress from '../../hooks/useLessonProgress';
 
 interface LessonsTabProps {
   courseId: number;
@@ -11,16 +12,26 @@ interface LessonsTabProps {
   isEnrolled: boolean;
 }
 
-export default function LessonsTab({ courseId, currentLessonId, onLessonPress, isEnrolled}: LessonsTabProps) {
+export default function LessonsTab({
+  courseId,
+  currentLessonId,
+  onLessonPress,
+  isEnrolled,
+}: LessonsTabProps) {
   const { sections, loading } = useCourseLessons(courseId);
   const [openSections, setOpenSections] = useState<Record<number, boolean>>({});
+
+  // Giả lập userId = 1
+  const userId = 1;
+
+  // Lấy progress
+  const { completedLessonIds, loading: progLoading, markComplete } = useLessonProgress(userId, courseId);
 
   useEffect(() => {
     if (sections.length > 0 && currentLessonId) {
       const sectionWithCurrent = sections.find(section =>
         section.lessons.some(lesson => lesson.id === currentLessonId)
       );
-
       if (sectionWithCurrent) {
         setOpenSections({ [sectionWithCurrent.id]: true });
       }
@@ -28,20 +39,22 @@ export default function LessonsTab({ courseId, currentLessonId, onLessonPress, i
   }, [sections, currentLessonId]);
 
   const toggleSection = (sectionId: number) => {
-    setOpenSections(prev => ({...prev,[sectionId]: !prev[sectionId],}));
+    setOpenSections(prev => ({ ...prev, [sectionId]: !prev[sectionId] }));
   };
 
   const handleLessonPress = (lesson: Lesson) => {
     if (lesson.isFree || isEnrolled) {
       onLessonPress(lesson);
     } else {
-      Alert.alert( 'Khóa học bị khóa', 'Bài học này chỉ dành cho học viên đã mua khóa học!',
+      Alert.alert(
+        'Khóa học bị khóa',
+        'Bài học này chỉ dành cho học viên đã mua khóa học!',
         [{ text: 'OK', style: 'default' }]
       );
     }
   };
 
-  if (loading) {
+  if (loading || progLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#00bfff" />
@@ -63,18 +76,52 @@ export default function LessonsTab({ courseId, currentLessonId, onLessonPress, i
             {isOpen &&
               section.lessons.map((lesson, idx) => {
                 const isActive = lesson.id === currentLessonId;
+                const isCompleted = completedLessonIds.has(lesson.id);
+                const canAccess = lesson.isFree || isEnrolled;
+
                 return (
-                  <Pressable key={lesson.id} style={[styles.lessonItem, isActive && { backgroundColor: '#e6f7ff' }]}
+                  <Pressable
+                    key={lesson.id}
+                    style={[styles.lessonItem, isActive && { backgroundColor: '#e6f7ff' }]}
                     onPress={() => handleLessonPress(lesson)}
                   >
-                    <Text style={styles.lessonNumber}> {(idx + 1).toString().padStart(2, '0')}</Text>
+                    {/* Tích xanh hoặc số thứ tự */}
+                    {isCompleted ? (
+                      <Ionicons name="checkmark-circle" size={22} color="#4CAF50" />
+                    ) : (
+                      <Text style={styles.lessonNumber}>
+                        {(idx + 1).toString().padStart(2, '0')}
+                      </Text>
+                    )}
+
                     <View style={styles.lessonInfo}>
                       <Text style={styles.lessonTitle}>{lesson.title}</Text>
-                      <Text style={styles.duration}> {(lesson.durationInSeconds / 60).toFixed(1)} phút</Text>
+                      <Text style={styles.duration}>
+                        {(lesson.durationInSeconds / 60).toFixed(1)} phút
+                      </Text>
                     </View>
-                    <Ionicons name={ isActive ? 'play-circle' : lesson.isFree || isEnrolled ? 'play-circle-outline' : 'lock-closed-outline'}
+
+                    {/* Nút Hoàn thành */}
+                    {canAccess && !isCompleted && (
+                      <Pressable
+                        onPress={() => markComplete(lesson.id)}
+                        style={styles.completeButton}
+                      >
+                        <Text style={styles.completeText}>Hoàn thành</Text>
+                      </Pressable>
+                    )}
+
+                    {/* Icon play / lock */}
+                    <Ionicons
+                      name={
+                        isActive
+                          ? 'play-circle'
+                          : canAccess
+                          ? 'play-circle-outline'
+                          : 'lock-closed-outline'
+                      }
                       size={20}
-                      color={ isActive ? '#00bfff' : lesson.isFree || isEnrolled ? '#00bfff' : '#999'}
+                      color={isActive ? '#00bfff' : canAccess ? '#00bfff' : '#999'}
                     />
                   </Pressable>
                 );
@@ -109,9 +156,11 @@ const styles = StyleSheet.create({
   lessonInfo: { flex: 1, marginLeft: 12 },
   lessonTitle: { fontSize: 14, color: '#333' },
   duration: { fontSize: 12, color: '#999', marginTop: 2 },
+  completeButton: { marginRight: 8 },
+  completeText: { color: '#4CAF50', fontWeight: '600', fontSize: 13 },
   loadingContainer: {
     paddingVertical: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
-})
+});
