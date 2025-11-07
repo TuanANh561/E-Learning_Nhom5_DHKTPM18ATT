@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Lesson } from '../../types';
 import useCourseLessons from '../../hooks/useCourseLessons';
 import useLessonProgress from '../../hooks/useLessonProgress';
+import { useAuth } from '../../hooks/AuthContext';
 
 interface LessonsTabProps {
   courseId: number;
@@ -12,17 +13,12 @@ interface LessonsTabProps {
   isEnrolled: boolean;
 }
 
-export default function LessonsTab({
-  courseId,
-  currentLessonId,
-  onLessonPress,
-  isEnrolled,
-}: LessonsTabProps) {
+export default function LessonsTab({courseId, currentLessonId, onLessonPress, isEnrolled}: LessonsTabProps) {
   const { sections, loading } = useCourseLessons(courseId);
   const [openSections, setOpenSections] = useState<Record<number, boolean>>({});
-
+  const { user, isLoggedIn} = useAuth();
   // Giả lập userId = 1
-  const userId = 1;
+  const userId = user?.id || 0;
 
   // Lấy progress
   const { completedLessonIds, loading: progLoading, markComplete } = useLessonProgress(userId, courseId);
@@ -102,7 +98,7 @@ export default function LessonsTab({
                     </View>
 
                     {/* Nút Hoàn thành */}
-                    {canAccess && !isCompleted && (
+                    {canAccess && !isCompleted && isLoggedIn && (
                       <Pressable
                         onPress={() => markComplete(lesson.id)}
                         style={styles.completeButton}

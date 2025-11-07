@@ -11,11 +11,14 @@ import InspiringCoursesSection from '../components/course/InspiringCoursesSectio
 import PopularCoursesSection from '../components/course/PopularCoursesSection';
 import TopTeachersSection from '../components/teacher/TopTeachersSection';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../hooks/AuthContext';
 
 export default function HomeScreen() {
   const { categories, loading: l1, error: e1, refetch: refetchCategories } = useCategories();
   const { popular, recommended, inspiring, loading: l2, error: e2, refetch: refetchCourses } = useCourses();
   const { topTeachers, loading: l3, error: e3, refetch: refetchUsers} = useUsers();
+
+  const { user, isLoggedIn } = useAuth();
 
   const loading = l1 || l2 || l3;
   const error = e1 || e2 || e3;
@@ -51,14 +54,22 @@ export default function HomeScreen() {
     );
   }
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 10) return `Chào buổi sáng ${user?.fullName || ""}`;
+    if (hour < 18) return `Chào buổi chiều ${user?.fullName || ""}`;
+    if (hour >= 18) return `Chào buổi tối ${user?.fullName || ""} Siêng thế e`
+    return '';
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
       
       {/* App Header (Hello, Cart, Notification) */}
       <View style={styles.appHeader}>
         <View>
-            <Text style={styles.greeting}>Xin chào, Oxy!</Text>
-            <Text style={styles.subtitle}>Hôm nay bạn muốn học gì?</Text>
+            <Text style={styles.greeting}>{getGreeting()}</Text>
+            <Text style={styles.subtitle}>Hôm nay bạn muốn học gì nào?</Text>
         </View>
         <View style={styles.headerIcons}>
             <Ionicons name="notifications-outline" size={24} color="white" />

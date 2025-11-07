@@ -6,6 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import useCourseLessons from '../../hooks/useCourseLessons';
 import useLessonProgress from '../../hooks/useLessonProgress';
 import { RootStackParamList, Lesson } from '../../types';
+import { useAuth } from '../../hooks/AuthContext';
 
 type Props = {
   courseId: number;
@@ -15,8 +16,8 @@ type Props = {
 
 export default function CourseLessonsTab({ courseId, onLessonPressPause, isEnrolled }: Props) {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'Learning'>>();
-
-  const userId = 1;  // Giả lập user ở đây
+  const { user, isLoggedIn} = useAuth();
+  const userId = user?.id || 0;
 
   const { sections = [], loading: secLoading } = useCourseLessons(courseId);
   const { completedLessonIds, loading: progLoading, markComplete } = useLessonProgress(userId, courseId);
@@ -98,7 +99,7 @@ export default function CourseLessonsTab({ courseId, onLessonPressPause, isEnrol
                       </Text>
                     </View>
 
-                    {canAccess && !isCompleted && (
+                    {canAccess && !isCompleted && isLoggedIn &&(
                       <Pressable
                         onPress={() => markComplete(lesson.id)}
                         style={styles.completeButton}

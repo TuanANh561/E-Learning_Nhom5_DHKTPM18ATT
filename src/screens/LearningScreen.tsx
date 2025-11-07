@@ -87,7 +87,7 @@ export default function LearningScreen() {
       <ScrollView>
         <View style={styles.header}>
           <Ionicons name="arrow-back" size={24} color="#333" onPress={() => navigation.goBack()} />
-          <Text style={styles.headerTitle}>Learning Lessons</Text>
+          <Text style={styles.headerTitle}>Bài học</Text>
           <View style={styles.headerIcons}>
             <Ionicons name="bookmark-outline" size={24} color="#333" />
             <Ionicons name="ellipsis-vertical" size={24} color="#333" style={{ marginLeft: 10 }} />

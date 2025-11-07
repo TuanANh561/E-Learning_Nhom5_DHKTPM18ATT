@@ -13,7 +13,7 @@ export type RootStackParamList = {
     PurchaseSuccess: { course: Course };
     Login: undefined;
     Register: undefined;
-    Profile: { isLoggedIn?: boolean; userId?: number };
+    Profile: undefined;
 };
 
 export type RootTabParamList = {

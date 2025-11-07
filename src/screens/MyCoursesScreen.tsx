@@ -2,20 +2,18 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { View, Text, ScrollView, Image, Pressable, ActivityIndicator, StyleSheet,} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Progress from 'react-native-progress';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-
-import useMyCourses from '../hooks/useMyCourses';
 import { RootStackParamList, MyCourse } from '../types';
+import useMyCourses from '../hooks/useMyCourses';
+import { useAuth } from '../hooks/AuthContext';
 
 type MyCoursesNavigationProp = StackNavigationProp<RootStackParamList, 'MyCourses'>;
 
 export default function MyCoursesScreen() {
   const navigation = useNavigation<MyCoursesNavigationProp>();
-
-  const USER_ID = 1;
-
-  const { fetchMyCourses, loading, error } = useMyCourses(USER_ID);
+  const { user, isLoggedIn } = useAuth();
+  const { loading, error, fetchMyCourses, refetch } = useMyCourses();
 
   const [courses, setCourses] = useState<MyCourse[]>([]);
   const [activeTab, setActiveTab] = useState<'ALL' | 'ON GOING' | 'COMPLETED'>('ALL');
@@ -37,7 +35,15 @@ export default function MyCoursesScreen() {
 
   useEffect(() => {
     loadCourses(1);
-  }, [loadCourses]);
+  }, [loadCourses, user]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (isLoggedIn) {
+        refetch(); // ← TỰ ĐỘNG LOAD MỖI KHI QUA TAB
+      }
+    }, [isLoggedIn, refetch])
+  );
 
   const filteredCourses = useMemo(() => {
     if (activeTab === 'ALL') return courses;

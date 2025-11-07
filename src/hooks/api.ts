@@ -1,4 +1,11 @@
-export const BASE_URL = 'http://192.168.1.7:8080'; //Wifi nhà
+import axios from 'axios';
+
+export const BASE_URL = 'http://192.168.1.7:8080';
+
+export const axiosInstance = axios.create({
+  baseURL: BASE_URL,
+  withCredentials: true, // để FE nhận session cookie
+});
 
 export const API_URL = {
   categories: `${BASE_URL}/categories`,

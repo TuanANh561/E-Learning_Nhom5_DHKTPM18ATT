@@ -13,6 +13,7 @@ import CourseReviewTab from '../components/courseDetails/CourseReviewTab';
 import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import useEnrollment from '../hooks/useEnrollment';
+import { useAuth } from '../hooks/AuthContext';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -23,6 +24,7 @@ export default function CourseDetailScreen() {
 
   const { fetchCourseById, fetchByCategoryId, loading: coursesLoading } = useCourses();
   const { reviews, loading: reviewsLoading, fetchReviewByCourseId } = useReviews();
+  const { user } = useAuth();
 
   const [course, setCourse] = useState<Course>();
   const [similarCourses, setSimilarCourses] = useState<Course[]>([]);
@@ -32,7 +34,7 @@ export default function CourseDetailScreen() {
   const [activeTab, setActiveTab] = useState('Tổng quan');
   const [isFullScreen, setIsFullScreen] = useState(false);
 
-  const userId = 1; // Giả lập user ở đây
+  const userId = user?.id || 0;
   const { isEnrolled, loading: enrollmentLoading } = useEnrollment(userId, course?.id || null);
 
 
@@ -95,11 +97,7 @@ export default function CourseDetailScreen() {
     if (!userId) {
       Alert.alert(
         'Yêu cầu đăng nhập',
-        'Vui lòng đăng nhập để mua khóa học.',
-        [
-          { text: 'Hủy', style: 'cancel' },
-          { text: 'Đăng nhập', onPress: () => navigation.navigate('Login') },
-        ]
+        'Vui lòng đăng nhập để mua khóa học.'
       );
       return;
     }
